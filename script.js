@@ -8,33 +8,36 @@ const CONFIG = {
     userEmail: "dsimkhada@caldwell.edu",
     userPhone: "+1 (475) 257-2067",
     userLocation: "Caldwell, NJ",
+    
+    // Make sure this matches your actual image file name
     profileImage: "./profile.jpg",
-  
-    aboutText: `I'm a dedicated Computer Science student at Caldwell University, currently pursuing my Bachelor's degree with a perfect 4.0 GPA in the Honors Program.
-  With a passion for programming, design, and AI, I've worked on various projects including home chef booking apps, face detection systems, and voice assistants.
-  I'm also a campus-certified tutor, helping fellow students excel in programming.`,
-  
+
+    // This text appears in the "About" section
+    aboutText: `I'm a dedicated Computer Science student at Caldwell University (Honors Program) with a 4.0 GPA. I specialize in Python, AI/ML, and Full Stack Development. I love building practical tools like voice assistants and booking apps.`,
+
     yearsExperience: "2+",
     projectsCount: "4+",
     clientsCount: "20+",
-  
-    // Weather API
+    
+    // Your Weather API Key
     weatherAPIKey: "b274ffcf25df2f311d16051068ced176",
     defaultLocation: "Caldwell, NJ",
-  
-    // Resume
+
+    // Link to your resume file
     resumeLink: "resume.pdf",
-  
-    // Chatbot KB (simple + fast)
+
+    // CHATBOT KNOWLEDGE BASE (Edit answers here)
     knowledgeBase: {
-      education:
-        "B.S. in Computer Science (Honors Program), Caldwell University — 4.0 GPA — Expected May 2028",
-      experience:
-        "Computer Science Tutor at Caldwell University; Marketing Staff at Earthbound Expeditions; High School Tutor at Malpi Institute",
-      projects: ["Chef on Call", "Face Filter", "Voice Assistant", "Face Detection"],
-      skills: ["Python", "HTML/CSS", "Figma", "TensorFlow", "OpenCV", "Wireframing", "Responsive Web", "Canva"]
+        // key words : answer
+        "education": "I am pursuing a <b>B.S. in Computer Science</b> at <b>Caldwell University</b> (Honors Program) with a <b>4.0 GPA</b>. Expected graduation: May 2028.",
+        "experience": "I am currently a <b>Computer Science Tutor</b> at Caldwell University. I also have experience as a Marketing Staff member at Earthbound Expeditions and a High School Tutor.",
+        "skills": "My technical skills include: <br>• <b>Languages:</b> Python, HTML, CSS, JavaScript<br>• <b>Tools:</b> Figma, Canva<br>• <b>AI:</b> OpenCV, TensorFlow",
+        "projects": "Here are my top projects:<br>1. <b>Chef on Call</b> (UI/UX Design)<br>2. <b>Voice Assistant</b> (Python Automation)<br>3. <b>Face Detection</b> (Computer Vision)",
+        "contact": "You can email me at <a href='mailto:dsimkhada@caldwell.edu' style='color:#6366f1'>dsimkhada@caldwell.edu</a> or call <b>+1 (475) 257-2067</b>.",
+        "location": "I am currently based in <b>Caldwell, NJ</b>.",
+        "default": "I can answer questions about my <b>education</b>, <b>skills</b>, <b>projects</b>, or <b>experience</b>. What would you like to know?"
     }
-  };
+};
   
   // ============================================
   // GLOBALS
@@ -487,105 +490,115 @@ const CONFIG = {
   // ============================================
   
   function initializeChatbot() {
-    const toggle = document.getElementById("chatbotToggle");
-    const windowEl = document.getElementById("chatbotWindow");
-    const closeBtn = document.getElementById("chatbotClose");
-    const sendBtn = document.getElementById("chatbotSend");
+    // We only need to listen for the "Enter" key here.
+    // The toggle and close buttons are handled by onclick="..." in the HTML.
     const input = document.getElementById("chatbotInput");
-  
-    if (!toggle || !windowEl) return;
-  
-    // Add listeners even though HTML has onclick (safe)
-    toggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleChatbot();
-    });
-  
-    closeBtn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      closeChatbot();
-    });
-  
-    sendBtn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      sendChatMessage();
-    });
-  
-    input?.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        sendChatMessage();
-      }
-    });
-  }
-  
-  function toggleChatbot() {
-    const windowEl = document.getElementById("chatbotWindow");
-    const input = document.getElementById("chatbotInput");
-    if (!windowEl) return;
-  
-    windowEl.classList.toggle("active");
-    if (windowEl.classList.contains("active")) {
-      setTimeout(() => input?.focus(), 120);
+    
+    if (input) {
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
     }
-  }
-  
-  function closeChatbot() {
+}
+
+// Opens or Closes the chat window
+function toggleChatbot() {
     const windowEl = document.getElementById("chatbotWindow");
-    windowEl?.classList.remove("active");
-  }
-  
-  function sendChatMessage() {
     const input = document.getElementById("chatbotInput");
-    const message = input?.value?.trim();
+    
+    if (!windowEl) return;
+
+    // Toggle the active class
+    windowEl.classList.toggle("active");
+    
+    // Focus the input field if the window is opening
+    if (windowEl.classList.contains("active")) {
+        setTimeout(() => {
+            if (input) input.focus();
+        }, 100);
+    }
+}
+
+// Forces the chat window to close
+function closeChatbot() {
+    const windowEl = document.getElementById("chatbotWindow");
+    if (windowEl) {
+        windowEl.classList.remove("active");
+    }
+}
+
+// Handles sending the message and getting a reply
+function sendChatMessage() {
+    const input = document.getElementById("chatbotInput");
+    const message = input ? input.value.trim() : "";
+
     if (!message) return;
-  
+
+    // 1. Show User Message
     addChatMessage(message, "user");
     input.value = "";
-  
-    setTimeout(() => addChatMessage(getBotResponse(message), "bot"), 450);
-  }
-  
-  function addChatMessage(message, type) {
+
+    // 2. Simulate "Thinking" delay (600ms)
+    setTimeout(() => {
+        const response = getBotResponse(message);
+        addChatMessage(response, "bot");
+    }, 600);
+}
+
+// Helper to add HTML to the chat box
+function addChatMessage(text, sender) {
     const container = document.getElementById("chatbotMessages");
     if (!container) return;
-  
-    const msgEl = document.createElement("div");
-    msgEl.className = `chat-message ${type}-message`;
-  
-    const content = document.createElement("div");
-    content.className = "message-content";
-    content.textContent = message;
-  
-    msgEl.appendChild(content);
-    container.appendChild(msgEl);
+
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `chat-message ${sender}-message`;
+    msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
+    
+    container.appendChild(msgDiv);
+    
+    // Auto-scroll to the bottom
     container.scrollTop = container.scrollHeight;
-  }
-  
-  function getBotResponse(message) {
-    const m = message.toLowerCase();
+}
+
+// Logic to find the right answer
+function getBotResponse(input) {
+    const text = input.toLowerCase();
     const kb = CONFIG.knowledgeBase;
-  
-    if (/^(hi|hello|hey|good morning|good afternoon|good evening)$/.test(m)) {
-      return `Hi! Ask me about ${CONFIG.userName}'s education, experience, skills, projects, or contact info.`;
+
+    // Check for keywords
+    if (text.includes("educat") || text.includes("college") || text.includes("study") || text.includes("school")) {
+        return kb.education;
     }
-    if (/contact|email|phone|reach/.test(m)) {
-      return `📧 ${CONFIG.userEmail}\n📱 ${CONFIG.userPhone}\n📍 ${CONFIG.userLocation}`;
+    if (text.includes("experi") || text.includes("work") || text.includes("job")) {
+        return kb.experience;
     }
-    if (/education|university|gpa|honors/.test(m)) return kb.education;
-    if (/experience|work|job|tutor|marketing/.test(m)) return kb.experience;
-    if (/projects|portfolio|built/.test(m)) return `Projects: ${kb.projects.join(", ")}.`;
-    if (/skills|tech|stack/.test(m)) return `Skills: ${kb.skills.join(", ")}.`;
-    if (/resume|cv/.test(m)) return `Click “Download Resume” or open: ${CONFIG.resumeLink}`;
-  
-    return `Try asking: "What projects did you build?" or "How can I contact you?"`;
-  }
-  
-  window.toggleChatbot = toggleChatbot;
-  window.closeChatbot = closeChatbot;
-  window.sendChatMessage = sendChatMessage;
+    if (text.includes("skill") || text.includes("tech") || text.includes("python") || text.includes("program")) {
+        return kb.skills;
+    }
+    if (text.includes("project") || text.includes("app") || text.includes("create")) {
+        return kb.projects;
+    }
+    if (text.includes("contact") || text.includes("email") || text.includes("phone") || text.includes("call")) {
+        return kb.contact;
+    }
+    if (text.includes("location") || text.includes("where") || text.includes("live")) {
+        return kb.location;
+    }
+    if (text.match(/^(hi|hello|hey|greetings)/)) {
+        return "Hello! 👋 I am Digvijay's AI assistant. Ask me about my <b>projects</b>, <b>skills</b>, or <b>experience</b>!";
+    }
+
+    // Default response if no keywords match
+    return kb.default;
+}
+
+// IMPORTANT: Expose functions so HTML onclick="" works
+window.toggleChatbot = toggleChatbot;
+window.closeChatbot = closeChatbot;
+window.sendChatMessage = sendChatMessage;
   
   // ============================================
   // CONTACT FORM
